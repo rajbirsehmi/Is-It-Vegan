@@ -1,5 +1,7 @@
 package com.creative.isitvegan.data.repo
 
+import com.creative.isitvegan.data.local.AppDatabase
+import com.creative.isitvegan.data.local.entity.ProductEntity
 import com.creative.isitvegan.data.remote.OpenFoodFactsApi
 import com.creative.isitvegan.data.remote.dto.ProductResponse
 import com.creative.isitvegan.domain.repo.Repository
@@ -8,7 +10,8 @@ import javax.inject.Singleton
 
 @Singleton
 class RepositoryImpl @Inject constructor(
-    private val api: OpenFoodFactsApi
+    private val api: OpenFoodFactsApi,
+    private val database: AppDatabase
 ) : Repository {
 
     override suspend fun getProduct(barcode: String): Result<ProductResponse> {
@@ -22,5 +25,9 @@ class RepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun saveProduct(product: ProductEntity): Long {
+        return database.productDao().insertProduct(product)
     }
 }

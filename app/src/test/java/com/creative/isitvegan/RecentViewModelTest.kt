@@ -3,7 +3,7 @@ package com.creative.isitvegan
 import com.creative.isitvegan.data.remote.dto.ProductDetails
 import com.creative.isitvegan.data.remote.dto.ProductResponse
 import com.creative.isitvegan.domain.repo.Repository
-import com.creative.isitvegan.ui.viewmodels.SearchViewModel
+import com.creative.isitvegan.ui.viewmodels.RecentViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -16,9 +16,9 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SearchViewModelTest {
+class RecentViewModelTest {
 
-    private lateinit var viewModel: SearchViewModel
+    private lateinit var viewModel: RecentViewModel
     private val repository: Repository = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
@@ -26,7 +26,7 @@ class SearchViewModelTest {
     fun setup() {
         // Redirect Dispatchers.Main to our test dispatcher
         Dispatchers.setMain(testDispatcher)
-        viewModel = SearchViewModel(repository)
+        viewModel = RecentViewModel(repository)
     }
 
     @After

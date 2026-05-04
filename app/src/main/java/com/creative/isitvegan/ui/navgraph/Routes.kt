@@ -6,6 +6,6 @@ object Routes {
     const val LOADING = "loading"
     const val PRODUCT = "product"
     const val ERROR = "error"
-    const val SCANNING = "scanning"
+    const val SCAN = "scanning"
 
 }

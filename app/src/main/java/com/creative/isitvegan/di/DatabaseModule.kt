@@ -3,7 +3,7 @@ package com.creative.isitvegan.di
 import android.content.Context
 import androidx.room.Room
 import com.creative.isitvegan.data.local.AppDatabase
-import com.creative.isitvegan.data.local.dao.IngredientDao
+import com.creative.isitvegan.data.local.dao.ProductDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +26,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideIngredientDao(database: AppDatabase): IngredientDao {
-        return database.ingredientDao()
+    fun provideProductDao(database: AppDatabase): ProductDao {
+        return database.productDao()
     }
 }

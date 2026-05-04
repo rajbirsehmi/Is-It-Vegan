@@ -8,16 +8,12 @@ plugins {
 
 android {
     namespace = "com.creative.isitvegan"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.creative.isitvegan"
-        minSdk = 30
-        targetSdk = 36
+        minSdk = 24
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
