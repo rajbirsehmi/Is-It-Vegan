@@ -15,13 +15,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.creative.isitvegan.ui.screens.ErrorScreen
 import com.creative.isitvegan.ui.screens.HomeScaffolding
 import com.creative.isitvegan.ui.screens.LoadingScreen
+import com.creative.isitvegan.ui.screens.ProductScreen
 import com.creative.isitvegan.ui.screens.ScanItemScreen
 import com.creative.isitvegan.ui.viewmodels.RecentSearchViewModel
 import com.creative.isitvegan.ui.viewmodels.ScanItemViewModel
@@ -33,23 +33,44 @@ fun NavGraph() {
     val navController = rememberNavController()
     val recentSearchViewModel = hiltViewModel<RecentSearchViewModel>()
     val scanItemViewModel = hiltViewModel<ScanItemViewModel>()
-    val searches = recentSearchViewModel.products
+    val searches by recentSearchViewModel.products.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) navController.navigate(Routes.SCAN)
-        else Toast.makeText(context, "Permission is required to scan the product", Toast.LENGTH_SHORT).show()
+        if (isGranted) {
+            scanItemViewModel.resetScanner()
+            navController.navigate(Routes.SCAN)
+        }
+        else Toast.makeText(
+            context,
+            "Permission is required to scan the product",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     val barcodeResult by scanItemViewModel.barcodeResult.collectAsStateWithLifecycle()
+    val existsInDb by scanItemViewModel.existsInDb.collectAsStateWithLifecycle()
 
-    LaunchedEffect(barcodeResult) {
-        if (barcodeResult?.isNotEmpty() == true) {
-            navController.navigate(Routes.LOADING) {
-                popUpTo(Routes.SCAN) { inclusive = true }
+    LaunchedEffect(barcodeResult, existsInDb) {
+        val code = barcodeResult
+        val exists = existsInDb
+        if (code != null && code.isNotEmpty() && exists != null) {
+            if (exists) {
+                // If it exists in DB, skip loading and go directly to product
+                Log.d("TAG", "NavGraph: Existed")
+                navController.navigate(Routes.getProductRoute(code)) {
+                    popUpTo(Routes.SCAN) { inclusive = true }
+                }
+            } else {
+                // If not in DB, go to loading screen to fetch from API
+                Log.d("TAG", "NavGraph: New")
+                navController.navigate(Routes.getLoadingRoute(code)) {
+                    popUpTo(Routes.SCAN) { inclusive = true }
+                }
             }
+            scanItemViewModel.clearBarcodeResult()
         }
     }
 
@@ -65,8 +86,14 @@ fun NavGraph() {
                         context,
                         Manifest.permission.CAMERA
                     ) == PackageManager.PERMISSION_GRANTED
-                    if (hasPermission) navController.navigate(Routes.SCAN)
+                    if (hasPermission) {
+                        scanItemViewModel.resetScanner()
+                        navController.navigate(Routes.SCAN)
+                    }
                     else permissionLauncher.launch(Manifest.permission.CAMERA)
+                },
+                onProductClick = { barcode ->
+                    navController.navigate(Routes.getProductRoute(barcode))
                 }
             )
         }
@@ -79,12 +106,47 @@ fun NavGraph() {
                 }
             )
         }
-        composable(
-            route = Routes.LOADING
-        ) {
-            LoadingScreen()
+        composable(Routes.LOADING) { backStackEntry ->
+            val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
+            LoadingScreen(
+                barcode = barcode,
+                onLoadingComplete = {
+                    navController.navigate(Routes.getProductRoute(barcode)) {
+                        popUpTo(Routes.LOADING) { inclusive = true }
+                    }
+                },
+                onNotFound = {
+                    Toast.makeText(context, "Product not found", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack(Routes.HOME, inclusive = false)
+                },
+                onError = {
+                    navController.navigate(Routes.getErrorRoute(barcode)) {
+                        popUpTo(Routes.LOADING) { inclusive = true }
+                    }
+                }
+            )
         }
-        composable(Routes.PRODUCT) {
+        composable(Routes.ERROR) { backStackEntry ->
+            val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
+            ErrorScreen(
+                onRetry = {
+                    navController.navigate(Routes.getLoadingRoute(barcode)) {
+                        popUpTo(Routes.getErrorRoute(barcode)) { inclusive = true }
+                    }
+                },
+                onBackToHome = {
+                    navController.popBackStack(Routes.HOME, inclusive = false)
+                }
+            )
+        }
+        composable(Routes.PRODUCT) { backStackEntry ->
+            val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
+            ProductScreen(
+                barcode = barcode,
+                onBackClick = {
+                    navController.popBackStack(Routes.HOME, inclusive = false)
+                }
+            )
         }
     }
 }
