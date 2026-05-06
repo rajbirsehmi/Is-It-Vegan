@@ -42,7 +42,8 @@ class RecentViewModelTest {
             status = 1,
             statusVerbose = "Product found",
             product = ProductDetails(
-                id = "123456",
+                id = 123456L,
+                barcode = barcode,
                 name = "Vegan Milk",
                 brands = "Vegan Brand"
             )
