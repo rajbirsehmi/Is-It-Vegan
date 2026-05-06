@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProductDetails(
     // Identification & General Info
-    val id: Long?,
+    val id: Long? = null,
     @SerialName("_id") val barcode: String? = null,
     @SerialName("product_name") val name: String? = null,
     @SerialName("brands") val brands: String? = null,

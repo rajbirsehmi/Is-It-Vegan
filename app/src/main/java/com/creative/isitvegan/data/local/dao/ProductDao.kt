@@ -1,6 +1,7 @@
 package com.creative.isitvegan.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -15,6 +16,12 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE id = :id")
     suspend fun getProductById(id: String): ProductEntity?
 
-    @Query("SELECT * FROM products")
-    fun getAllProducts(): List<ProductEntity>
+    @Query("SELECT * FROM products WHERE barcode = :barcode")
+    suspend fun getProductByBarcode(barcode: String): ProductEntity?
+
+    @Query("SELECT * FROM products ORDER BY id DESC")
+    fun getAllProducts(): Flow<List<ProductEntity>>
+
+    @Delete
+    suspend fun deleteProduct(product: ProductEntity)
 }
