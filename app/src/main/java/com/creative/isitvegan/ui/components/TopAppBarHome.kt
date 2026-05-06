@@ -2,10 +2,7 @@
 
 package com.creative.isitvegan.ui.components
 
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -14,16 +11,20 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TopAppBarHome() {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
             Text(
                 "Is It Vegan?",
-                style = typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Medium
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.primary
                 ),
                 modifier = Modifier.testTag("top_bar_title")
             )
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
     )
 }
 
