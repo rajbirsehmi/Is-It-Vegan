@@ -1,5 +1,6 @@
 package com.creative.isitvegan.data.repo
 
+import android.util.Log
 import com.creative.isitvegan.data.local.AppDatabase
 import com.creative.isitvegan.data.local.entity.ProductEntity
 import com.creative.isitvegan.data.remote.OpenFoodFactsApi
@@ -16,18 +17,34 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun getProduct(barcode: String): Result<ProductResponse> {
         return try {
+            Log.d("TAG", "Inside Repo: $barcode")
             val response = api.getProduct(barcode)
-            if (response.status == 1) {
+            Log.d("TAG", "Response received: status=${response.status}, isFound=${response.isFound}")
+            if (response.isFound) {
                 Result.success(response)
             } else {
+                Log.d("TAG", "Product not found: ${response.statusVerbose}")
                 Result.failure(Exception(response.statusVerbose ?: "Product not found"))
             }
         } catch (e: Exception) {
+            Log.e("TAG", "Repository Error: ${e.message}", e)
             Result.failure(e)
         }
     }
 
     override suspend fun saveProduct(product: ProductEntity): Long {
         return database.productDao().insertProduct(product)
+    }
+
+    override suspend fun getProductFromDb(barcode: String): ProductEntity? {
+        return database.productDao().getProductByBarcode(barcode)
+    }
+
+    override fun getAllProducts(): kotlinx.coroutines.flow.Flow<List<ProductEntity>> {
+        return database.productDao().getAllProducts()
+    }
+
+    override suspend fun deleteProduct(product: ProductEntity) {
+        database.productDao().deleteProduct(product)
     }
 }
