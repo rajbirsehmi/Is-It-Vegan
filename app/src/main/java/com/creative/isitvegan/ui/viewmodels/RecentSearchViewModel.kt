@@ -1,21 +1,30 @@
 package com.creative.isitvegan.ui.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.creative.isitvegan.data.remote.dto.ProductResponse
+import androidx.lifecycle.viewModelScope
+import com.creative.isitvegan.data.local.entity.ProductEntity
 import com.creative.isitvegan.domain.repo.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.emptyList
 
 @HiltViewModel
 class RecentSearchViewModel @Inject constructor(
     private val repository: Repository
 ): ViewModel() {
-    var products by mutableStateOf<List<String>>(emptyList())
-        private set
+    val products: StateFlow<List<ProductEntity>> = repository.getAllProducts()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-
+    fun deleteProduct(product: ProductEntity) {
+        viewModelScope.launch {
+            repository.deleteProduct(product)
+        }
+    }
 }
