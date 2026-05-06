@@ -1,26 +1,127 @@
 package com.creative.isitvegan.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.creative.isitvegan.ui.theme.IsItVeganTheme
-import com.creative.isitvegan.ui.viewmodels.LoadProductViewModel
-import com.creative.isitvegan.ui.viewmodels.ScanItemViewModel
-import androidx.compose.runtime.collectAsState
+import com.creative.isitvegan.ui.viewmodels.LoadingViewModel
+import kotlinx.coroutines.delay
 
 @Composable
-fun LoadingScreen() {
-    Box(
+fun LoadingScreen(
+    barcode: String,
+    viewModel: LoadingViewModel = hiltViewModel(),
+    onLoadingComplete: () -> Unit,
+    onNotFound: () -> Unit,
+    onError: () -> Unit
+) {
+    val product = viewModel.productResponse
+    val error = viewModel.error
+
+    LaunchedEffect(barcode) {
+        viewModel.getProduct(barcode)
+    }
+
+    var navigated by remember { mutableStateOf(false) }
+
+    LaunchedEffect(product, error) {
+        if (navigated) return@LaunchedEffect
+
+        if (product != null) {
+            navigated = true
+            onLoadingComplete()
+        } else if (error != null) {
+            navigated = true
+            if (error.contains("not found", ignoreCase = true)) {
+                onNotFound()
+            } else {
+                onError()
+            }
+        }
+    }
+
+    val loadingMessages = listOf(
+        "Analyzing ingredients...",
+        "Checking vegan status...",
+        "Decoding labels...",
+        "Almost there..."
+    )
+    var currentMessageIndex by remember { mutableIntStateOf(0) }
+    
+    LaunchedEffect(Unit) {
+        while(true) {
+            delay(2000)
+            currentMessageIndex = (currentMessageIndex + 1) % loadingMessages.size
+        }
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
+
+    Surface(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        color = MaterialTheme.colorScheme.background
     ) {
-        CircularProgressIndicator()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(120.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .scale(scale)
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f), CircleShape)
+                )
+                Icon(
+                    imageVector = Icons.Default.Eco,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                strokeWidth = 3.dp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = loadingMessages[currentMessageIndex],
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -28,6 +129,11 @@ fun LoadingScreen() {
 @Preview
 fun LoadingScreenPreview() {
     IsItVeganTheme {
-        LoadingScreen()
+        LoadingScreen(
+            barcode = "",
+            onLoadingComplete = {},
+            onNotFound = {},
+            onError = { }
+        )
     }
 }

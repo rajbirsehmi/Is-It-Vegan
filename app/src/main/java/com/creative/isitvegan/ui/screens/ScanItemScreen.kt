@@ -1,5 +1,6 @@
 package com.creative.isitvegan.ui.screens
 
+import android.util.Log
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -18,6 +19,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,15 +52,23 @@ fun ScanItemScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val haptic = LocalHapticFeedback.current
     val scanner = remember { BarcodeScanning.getClient() }
+    val isScanComplete by viewModel.isScanComplete.collectAsState()
 
     // Initialize CameraController
     val cameraController = remember {
         LifecycleCameraController(context).apply {
-            // Enable Image Analysis for future barcode scanning logic
+            // Enable Image Analysis for barcode scanning logic
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS)
 
             setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
+                // STOP processing if scan is already complete
+                if (viewModel.isScanComplete.value) {
+                    imageProxy.close()
+                    return@setImageAnalysisAnalyzer
+                }
+
                 val mediaImage = imageProxy.image
                 if (mediaImage != null) {
                     val image =
@@ -64,6 +77,8 @@ fun ScanItemScreen(
                         .addOnSuccessListener { barcodes ->
                             if (barcodes.isNotEmpty()) {
                                 val code = barcodes[0].rawValue ?: ""
+                                Log.d("TAG", "Barcode Read: $code")
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 viewModel.onBarcodeDetected(code)
                             }
                         }
@@ -86,13 +101,11 @@ fun ScanItemScreen(
             factory = { context ->
                 PreviewView(context).apply {
                     this.controller = cameraController
-                    // Use COMPATIBLE mode (TextureView) to support alpha animations and transitions
                     implementationMode = PreviewView.ImplementationMode.COMPATIBLE
                     cameraController.bindToLifecycle(lifecycleOwner)
                 }
             },
             onRelease = {
-                // Ensure camera is unbound immediately when the view is released
                 cameraController.unbind()
             }
         )
@@ -100,7 +113,7 @@ fun ScanItemScreen(
         // The Viewfinder Overlay
         ViewfinderOverlay()
 
-        // Close Button (Common for scan screens)
+        // Close Button
         IconButton(
             onClick = onCloseClick,
             modifier = Modifier
@@ -116,7 +129,7 @@ fun ScanItemScreen(
             )
         }
 
-        // Instructions Text positioned below the viewfinder
+        // Instructions Text
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -124,13 +137,13 @@ fun ScanItemScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Scan Barcode",
+                text = if (isScanComplete) "Barcode Detected!" else "Scan Barcode",
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.White,
+                color = if (isScanComplete) MaterialTheme.colorScheme.primary else Color.White,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Place the barcode inside the frame to scan",
+                text = if (isScanComplete) "Processing..." else "Place the barcode inside the frame to scan",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.padding(top = 8.dp)
@@ -145,15 +158,13 @@ fun ViewfinderOverlay() {
         val width = size.width
         val height = size.height
 
-        // Define scanning frame dimensions (75% of screen width)
         val rectSize = width * 0.75f
         val left = (width - rectSize) / 2
-        val top = (height - rectSize) / 2.5f // Offset slightly above center
+        val top = (height - rectSize) / 2.5f
         val right = left + rectSize
         val bottom = top + rectSize
         val cornerRadius = 24.dp.toPx()
 
-        // 1. Semi-transparent background with a hole (cutout)
         val backgroundPath = Path().apply {
             addRect(Rect(0f, 0f, width, height))
             addRoundRect(
@@ -166,24 +177,10 @@ fun ViewfinderOverlay() {
         }
         drawPath(backgroundPath, Color.Black.copy(alpha = 0.6f))
 
-        // 2. Modern Accent Corners
         val cornerLength = 40.dp.toPx()
         val strokeWidth = 4.dp.toPx()
         val color = Color.White
 
-        // Helper to draw each corner with a smooth arc
-        fun drawCorner(startAngle: Float, sweep: Float, moveX: Float, moveY: Float, arcRect: Rect) {
-            drawPath(
-                path = Path().apply {
-                    // Logic to draw L-shaped corner with a curve
-                    // (Simplified for readability in this example)
-                },
-                color = color,
-                style = Stroke(width = strokeWidth)
-            )
-        }
-
-        // Manual drawing of the 4 corners for precision
         // Top Left
         drawPath(
             path = Path().apply {
