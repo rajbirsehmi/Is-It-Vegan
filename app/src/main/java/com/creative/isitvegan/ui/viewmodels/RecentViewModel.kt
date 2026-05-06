@@ -16,4 +16,13 @@ class RecentViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
+    var productResponse by mutableStateOf<ProductResponse?>(null)
+        private set
+
+    fun getProduct(barcode: String) {
+        viewModelScope.launch {
+            val result = repository.getProduct(barcode)
+            productResponse = result.getOrThrow()
+        }
+    }
 }
