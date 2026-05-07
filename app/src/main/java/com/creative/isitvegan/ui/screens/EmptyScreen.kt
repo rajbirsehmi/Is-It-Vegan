@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -109,7 +110,8 @@ fun EmptyScreen(
                     onClick = onScanClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
+                        .height(60.dp)
+                        .testTag("btn_scan"),
                     shape = MaterialTheme.shapes.extraLarge,
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     contentPadding = PaddingValues(horizontal = 24.dp)

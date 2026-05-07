@@ -36,6 +36,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -94,6 +95,7 @@ fun ScanItemScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
+            .testTag("camera_preview")
     ) {
         // Camera Preview Layer
         AndroidView(
