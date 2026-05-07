@@ -24,7 +24,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Is It Vegan"
 include(":app")
+include(":domain")
 include(":testing:engine")
 include(":testing:ui")
 include(":testing:unit")
+include(":testing:lint")
 
