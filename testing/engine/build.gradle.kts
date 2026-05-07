@@ -28,4 +28,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.test.junit4)
     implementation(libs.androidx.compose.ui)
     implementation(libs.junit)
+    implementation(libs.hilt.testing)
+    implementation(libs.androidx.test.runner)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.test.uiautomator)
 }

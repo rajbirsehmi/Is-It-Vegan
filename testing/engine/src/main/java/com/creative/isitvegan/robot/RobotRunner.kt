@@ -20,15 +20,3 @@ inline fun <reified T : BaseRobot> launchRobot(
     robot.apply(block)
     return robot
 }
-
-/**
- * Functional interface or extension point for chaining robots.
- */
-fun <T : BaseRobot, R : BaseRobot> T.nextRobot(
-    nextRobotFactory: (ComposeContentTestRule) -> R,
-    block: R.() -> Unit
-): R {
-    val nextRobot = nextRobotFactory(rule)
-    nextRobot.apply(block)
-    return nextRobot
-}
