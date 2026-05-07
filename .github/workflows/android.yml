@@ -58,7 +58,7 @@ jobs:
           path: "**/build/reports/tests/testDebugUnitTest/"
 
   ui-test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -73,14 +73,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run UI Tests
-        run: ./gradlew :app:pixel2api30DebugAndroidTest :testing:ui:pixel2api30DebugAndroidTest
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: ./gradlew connectedDebugAndroidTest
 
       - name: Upload UI Test Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ui-test-report
-          path: "**/build/reports/androidTests/managedDevice/"
+          path: "**/build/reports/androidTests/connected/"
 
   build-apk:
     runs-on: ubuntu-latest
