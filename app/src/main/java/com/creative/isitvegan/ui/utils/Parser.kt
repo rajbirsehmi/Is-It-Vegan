@@ -1,7 +1,7 @@
 package com.creative.isitvegan.ui.utils
 
-import com.creative.isitvegan.data.local.entity.ProductEntity
-import com.creative.isitvegan.data.remote.dto.ProductDetails
+import com.creative.isitvegan.domain.model.ProductEntity
+import com.creative.isitvegan.domain.model.ProductDetails
 
 fun ProductDetails.toEntity(): ProductEntity {
     return ProductEntity(
