@@ -10,6 +10,10 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/testing" />
+            <option value="$PROJECT_DIR$/testing/engine" />
+            <option value="$PROJECT_DIR$/testing/ui" />
+            <option value="$PROJECT_DIR$/testing/unit" />
           </set>
         </option>
       </GradleProjectSettings>
