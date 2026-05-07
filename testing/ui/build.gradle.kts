@@ -19,15 +19,32 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        animationsDisabled = true
+        managedDevices {
+            localDevices {
+                create("pixel2api30") {
+                    device = "Pixel 2"
+                    apiLevel = 30
+                    systemImageSource = "aosp"
+                }
+            }
+        }
+    }
 }
 
 dependencies {
+    lintChecks(project(":testing:lint"))
     implementation(project(":testing:engine"))
+    implementation(project(":domain"))
     
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui.test.junit4)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.junit)
+    implementation(libs.androidx.espresso.core)
     implementation(libs.hilt.android)
     implementation(libs.hilt.testing)
     ksp(libs.hilt.compiler)

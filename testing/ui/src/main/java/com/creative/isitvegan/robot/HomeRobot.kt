@@ -1,16 +1,18 @@
 package com.creative.isitvegan.robot
 
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 
 class HomeRobot(rule: ComposeContentTestRule) : BaseRobot(rule) {
 
     fun verifyTitleVisible() {
+        waitUntilNodeExists("top_bar_title")
         assertIsDisplayed("top_bar_title")
     }
 
     fun clickScanButton() {
         // The FAB uses contentDescription "Scan"
-        onNodeWithContentDescription("Scan").performClick()
+        onNodeWithTag("btn_scan").performClick()
     }
 
     fun verifyEmptyStateVisible() {
