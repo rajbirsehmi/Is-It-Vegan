@@ -1,7 +1,7 @@
 package com.creative.isitvegan.di
 
 import com.creative.isitvegan.data.repo.RepositoryImpl
-import com.creative.isitvegan.domain.repo.Repository
+import com.creative.isitvegan.repo.Repository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

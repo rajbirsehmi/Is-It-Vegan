@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.creative.isitvegan.domain.model.ProductEntity
-import com.creative.isitvegan.domain.model.Ingredients
+import com.creative.isitvegan.model.ProductEntity
+import com.creative.isitvegan.model.Ingredients
 import com.creative.isitvegan.ui.components.TopAppBarHome
 import com.creative.isitvegan.ui.theme.IsItVeganTheme
 import com.creative.isitvegan.ui.viewmodels.ProductViewModel

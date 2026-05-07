@@ -15,7 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.creative.isitvegan.domain.model.ProductEntity
+import com.creative.isitvegan.model.ProductEntity
 import com.creative.isitvegan.ui.components.SimpleRecentProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)
