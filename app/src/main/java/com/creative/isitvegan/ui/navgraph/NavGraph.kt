@@ -46,7 +46,7 @@ fun NavGraph() {
         else Toast.makeText(
             context,
             "Permission is required to scan the product",
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_LONG
         ).show()
     }
 
