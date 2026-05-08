@@ -15,19 +15,18 @@ class RepositoryImpl @Inject constructor(
     private val database: AppDatabase
 ) : Repository {
 
+    private val TAG = "RepositoryImpl"
+
     override suspend fun getProduct(barcode: String): Result<ProductResponse> {
         return try {
-            Log.d("TAG", "Inside Repo: $barcode")
             val response = api.getProduct(barcode)
-            Log.d("TAG", "Response received: status=${response.status}, isFound=${response.isFound}")
             if (response.isFound) {
                 Result.success(response)
             } else {
-                Log.d("TAG", "Product not found: ${response.statusVerbose}")
                 Result.failure(Exception(response.statusVerbose ?: "Product not found"))
             }
         } catch (e: Exception) {
-            Log.e("TAG", "Repository Error: ${e.message}", e)
+            Log.e(TAG, "Error fetching product $barcode: ${e.message}")
             Result.failure(e)
         }
     }

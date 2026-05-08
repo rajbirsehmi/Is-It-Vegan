@@ -3,7 +3,9 @@ package com.creative.isitvegan.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.creative.isitvegan.data.remote.dto.Ingredients
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "products")
 data class ProductEntity(
     @PrimaryKey(autoGenerate = true)

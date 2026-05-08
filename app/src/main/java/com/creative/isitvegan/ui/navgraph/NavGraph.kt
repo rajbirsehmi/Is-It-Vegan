@@ -29,7 +29,6 @@ import com.creative.isitvegan.ui.viewmodels.ScanItemViewModel
 @OptIn(ExperimentalGetImage::class)
 @Composable
 fun NavGraph() {
-    LocalContext.current
     val navController = rememberNavController()
     val recentSearchViewModel = hiltViewModel<RecentSearchViewModel>()
     val scanItemViewModel = hiltViewModel<ScanItemViewModel>()

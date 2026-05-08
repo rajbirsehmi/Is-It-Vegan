@@ -19,7 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,6 +44,8 @@ import com.creative.isitvegan.ui.viewmodels.ScanItemViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 @ExperimentalGetImage
 @Composable
 fun ScanItemScreen(
@@ -54,7 +56,12 @@ fun ScanItemScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val haptic = LocalHapticFeedback.current
     val scanner = remember { BarcodeScanning.getClient() }
-    val isScanComplete by viewModel.isScanComplete.collectAsState()
+    DisposableEffect(Unit) {
+        onDispose {
+            scanner.close()
+        }
+    }
+    val isScanComplete by viewModel.isScanComplete.collectAsStateWithLifecycle()
 
     // Initialize CameraController
     val cameraController = remember {

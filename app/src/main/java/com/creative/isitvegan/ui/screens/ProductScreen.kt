@@ -40,8 +40,7 @@ fun ProductScreen(
     viewModel: ProductViewModel = hiltViewModel(),
     onBackClick: () -> Unit = {}
 ) {
-    val product = viewModel.product
-    val isLoading = viewModel.isLoading
+    val uiState = viewModel.uiState
 
     LaunchedEffect(barcode) {
         viewModel.getProduct(barcode)
@@ -71,15 +70,25 @@ fun ProductScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if (product != null) {
-                ProductDetailsList(product)
-            } else {
-                EmptyState(modifier = Modifier.align(Alignment.Center))
+            ProductContent(uiState = uiState)
+        }
+    }
+}
+
+@Composable
+private fun ProductContent(uiState: com.creative.isitvegan.ui.viewmodels.ProductUiState) {
+    when (uiState) {
+        is com.creative.isitvegan.ui.viewmodels.ProductUiState.Loading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
+        }
+        is com.creative.isitvegan.ui.viewmodels.ProductUiState.Success -> {
+            ProductDetailsList(uiState.product)
+        }
+        is com.creative.isitvegan.ui.viewmodels.ProductUiState.Error,
+        is com.creative.isitvegan.ui.viewmodels.ProductUiState.Empty -> {
+            EmptyState(modifier = Modifier.fillMaxSize())
         }
     }
 }

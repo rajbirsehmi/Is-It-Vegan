@@ -6,128 +6,65 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.creative.isitvegan.data.local.entity.ProductEntity
-import com.creative.isitvegan.data.remote.dto.ProductDetails
+import com.creative.isitvegan.data.mapper.toEntity
+import com.creative.isitvegan.data.mapper.toResponse
 import com.creative.isitvegan.data.remote.dto.ProductResponse
 import com.creative.isitvegan.domain.repo.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed interface LoadingUiState {
+    object Idle : LoadingUiState
+    object Loading : LoadingUiState
+    data class Success(val product: ProductResponse) : LoadingUiState
+    data class Error(val message: String) : LoadingUiState
+}
+
 @HiltViewModel
 class LoadingViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    var productResponse by mutableStateOf<ProductResponse?>(null)
-        private set
+    private val TAG = "LoadingViewModel"
 
-    var error by mutableStateOf<String?>(null)
-        private set
-
-    var isLoading by mutableStateOf(false)
+    var uiState by mutableStateOf<LoadingUiState>(LoadingUiState.Idle)
         private set
 
     fun getProduct(barcode: String) {
-        if (isLoading) return
+        if (uiState is LoadingUiState.Loading) return
 
         viewModelScope.launch {
-            isLoading = true
-            error = null
+            uiState = LoadingUiState.Loading
             
             // 1. Check Database First
             val localProduct = repository.getProductFromDb(barcode)
             if (localProduct != null) {
-                Log.d("TAG", "Database Hit: ${localProduct.name}")
-                // Create a mock response to satisfy the current flow
-                productResponse = ProductResponse(
-                    status = 1,
-                    statusVerbose = "Product found in local database",
-                    product = ProductDetails(
-                        barcode = localProduct.barcode,
-                        name = localProduct.name,
-                        brands = localProduct.brands,
-                        quantity = localProduct.quantity,
-                        productType = localProduct.productType,
-                        keywords = localProduct.keywords,
-                        categories = localProduct.categories,
-                        dataSources = localProduct.dataSources,
-                        ingredientsAnalysisTags = localProduct.ingredientsAnalysisTags,
-                        labelsTags = localProduct.labelsTags,
-                        ecoScoreGrade = localProduct.ecoScoreGrade,
-                        ecoScore = localProduct.ecoScore,
-                        frontSmallUrl = localProduct.frontSmallUrl,
-                        frontThumbUrl = localProduct.frontThumbUrl,
-                        frontUrl = localProduct.frontUrl,
-                        ingredientsSmallUrl = localProduct.ingredientsSmallUrl,
-                        ingredientsThumbUrl = localProduct.ingredientsThumbUrl,
-                        ingredientsUrl = localProduct.ingredientsUrl,
-                        nutritionSmallUrl = localProduct.nutritionSmallUrl,
-                        nutritionThumbUrl = localProduct.nutritionThumbUrl,
-                        nutritionUrl = localProduct.nutritionUrl,
-                        smallUrl = localProduct.smallUrl,
-                        thumbUrl = localProduct.thumbUrl,
-                        url = localProduct.url,
-                        ingredients = localProduct.ingredients
-                    )
-                )
-                isLoading = false
+                Log.d(TAG, "Database Hit: ${localProduct.name}")
+                uiState = LoadingUiState.Success(localProduct.toResponse())
                 return@launch
             }
 
             // 2. Fallback to API
-            Log.d("TAG", "Repo Called For: $barcode")
+            Log.d(TAG, "Fetching from API: $barcode")
             repository.getProduct(barcode)
                 .onSuccess { response ->
-                    Log.d("TAG", "VM Success: product=${response.product?.name}")
-                    productResponse = response
-                    try {
-                        saveToDatabase(response)
-                    } catch (e: Exception) {
-                        Log.e("TAG", "Database Save Error: ${e.message}")
+                    Log.d(TAG, "API Success: ${response.product?.name}")
+                    response.product?.let { details ->
+                        try {
+                            repository.saveProduct(details.toEntity())
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Database Save Error: ${e.message}")
+                        }
                     }
-                    isLoading = false
+                    uiState = LoadingUiState.Success(response)
                 }
                 .onFailure { e ->
-                    Log.d("TAG", "VM Failure: ${e.message}")
-                    error = e.message ?: "An unknown error occurred"
-                    isLoading = false
+                    Log.e(TAG, "API Failure: ${e.message}")
+                    uiState = LoadingUiState.Error(e.message ?: "An unknown error occurred")
                 }
         }
     }
-
-    private suspend fun saveToDatabase(response: ProductResponse) {
-        val details = response.product ?: return // Don't save if there's no product info
-
-        repository.saveProduct(
-            ProductEntity(
-                id = null,
-                barcode = details.barcode,
-                name = details.name,
-                brands = details.brands,
-                quantity = details.quantity,
-                productType = details.productType,
-                keywords = details.keywords,
-                categories = details.categories,
-                dataSources = details.dataSources,
-                ingredientsAnalysisTags = details.ingredientsAnalysisTags,
-                labelsTags = details.labelsTags,
-                ecoScoreGrade = details.ecoScoreGrade,
-                ecoScore = details.ecoScore,
-                frontSmallUrl = details.frontSmallUrl,
-                frontThumbUrl = details.frontThumbUrl,
-                frontUrl = details.frontUrl,
-                ingredientsSmallUrl = details.ingredientsSmallUrl,
-                ingredientsThumbUrl = details.ingredientsThumbUrl,
-                ingredientsUrl = details.ingredientsUrl,
-                nutritionSmallUrl = details.nutritionSmallUrl,
-                nutritionThumbUrl = details.nutritionThumbUrl,
-                nutritionUrl = details.nutritionUrl,
-                smallUrl = details.smallUrl,
-                thumbUrl = details.thumbUrl,
-                url = details.url,
-                ingredients = details.ingredients
-            )
-        )
-    }
 }
+
+

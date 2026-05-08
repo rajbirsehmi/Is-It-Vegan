@@ -27,8 +27,7 @@ fun LoadingScreen(
     onNotFound: () -> Unit,
     onError: () -> Unit
 ) {
-    val product = viewModel.productResponse
-    val error = viewModel.error
+    val uiState = viewModel.uiState
 
     LaunchedEffect(barcode) {
         viewModel.getProduct(barcode)
@@ -36,22 +35,31 @@ fun LoadingScreen(
 
     var navigated by remember { mutableStateOf(false) }
 
-    LaunchedEffect(product, error) {
+    LaunchedEffect(uiState) {
         if (navigated) return@LaunchedEffect
 
-        if (product != null) {
-            navigated = true
-            onLoadingComplete()
-        } else if (error != null) {
-            navigated = true
-            if (error.contains("not found", ignoreCase = true)) {
-                onNotFound()
-            } else {
-                onError()
+        when (uiState) {
+            is com.creative.isitvegan.ui.viewmodels.LoadingUiState.Success -> {
+                navigated = true
+                onLoadingComplete()
             }
+            is com.creative.isitvegan.ui.viewmodels.LoadingUiState.Error -> {
+                navigated = true
+                if (uiState.message.contains("not found", ignoreCase = true)) {
+                    onNotFound()
+                } else {
+                    onError()
+                }
+            }
+            else -> {}
         }
     }
 
+    LoadingContent()
+}
+
+@Composable
+private fun LoadingContent() {
     val loadingMessages = listOf(
         "Analyzing ingredients...",
         "Checking vegan status...",
@@ -129,11 +137,6 @@ fun LoadingScreen(
 @Preview
 fun LoadingScreenPreview() {
     IsItVeganTheme {
-        LoadingScreen(
-            barcode = "",
-            onLoadingComplete = {},
-            onNotFound = {},
-            onError = { }
-        )
+        LoadingContent()
     }
 }
