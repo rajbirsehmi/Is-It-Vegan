@@ -24,3 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Is It Vegan"
 include(":app")
+include(":core-engine")
+include(":lint-rules")
