@@ -131,7 +131,7 @@ fun ScanItemScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Close",
+                contentDescription = "Close Camera",
                 tint = Color.White
             )
         }

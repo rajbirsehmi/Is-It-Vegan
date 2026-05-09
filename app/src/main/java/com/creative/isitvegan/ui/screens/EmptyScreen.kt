@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,6 +87,7 @@ fun EmptyScreen(
                 Spacer(modifier = Modifier.height(48.dp))
 
                 Text(
+                    modifier = Modifier.testTag("text_main"),
                     text = "Is It Vegan?",
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Black,
@@ -100,7 +102,9 @@ fun EmptyScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .testTag("text_sub_main")
                 )
 
                 Spacer(modifier = Modifier.height(64.dp))
@@ -109,7 +113,8 @@ fun EmptyScreen(
                     onClick = onScanClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
+                        .height(60.dp)
+                        .testTag("btn_scan"),
                     shape = MaterialTheme.shapes.extraLarge,
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     contentPadding = PaddingValues(horizontal = 24.dp)

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.creative.isitvegan.data.local.entity.ProductEntity
@@ -28,6 +29,7 @@ fun HomeScaffolding(
         floatingActionButton = {
             if (searches.isNotEmpty()) {
                 FloatingActionButton(
+                    modifier = Modifier.testTag("btn_scan"),
                     onClick = onScanClick,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary

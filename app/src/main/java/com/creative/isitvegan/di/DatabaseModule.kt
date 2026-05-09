@@ -22,7 +22,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "is_it_vegan_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
