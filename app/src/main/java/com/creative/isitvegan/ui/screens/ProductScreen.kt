@@ -60,7 +60,11 @@ fun ProductScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -137,7 +141,7 @@ fun ProductHeader(product: ProductEntity) {
     ) {
         Card(
             modifier = Modifier.size(120.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             AsyncImage(
@@ -178,7 +182,7 @@ fun VeganStatusBanner(product: ProductEntity) {
         isVegan -> Quad(
             "Certified Vegan Friendly", 
             Icons.Default.Eco, 
-            Color(0xFF4CAF50),
+            MaterialTheme.colorScheme.primary,
             "This product contains no animal-derived ingredients."
         )
         isNonVegan -> Quad(
@@ -197,7 +201,7 @@ fun VeganStatusBanner(product: ProductEntity) {
 
     Surface(
         color = color.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.medium,
         border = BorderStroke(1.dp, color.copy(alpha = 0.2f))
     ) {
         Row(
@@ -242,7 +246,7 @@ fun ProductInformationSection(product: ProductEntity) {
         
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(16.dp)
+            shape = MaterialTheme.shapes.medium
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 InfoItem("Barcode", product.barcode ?: "N/A")
@@ -270,7 +274,7 @@ fun IngredientItem(ingredient: Ingredients) {
     val vegetarian = ingredient.vegetarian
     
     val (color, text) = when {
-        vegan == "yes" -> Color(0xFF4CAF50) to "Vegan"
+        vegan == "yes" -> MaterialTheme.colorScheme.primary to "Vegan"
         vegetarian == "yes" -> Color(0xFF8BC34A) to "Vegetarian"
         vegan == "no" || vegetarian == "no" -> Color(0xFFF44336) to "Non-Vegan"
         else -> Color.Gray to "Unknown"
@@ -278,7 +282,7 @@ fun IngredientItem(ingredient: Ingredients) {
 
     Surface(
         color = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
         Row(
@@ -296,7 +300,7 @@ fun IngredientItem(ingredient: Ingredients) {
             
             Surface(
                 color = color.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.small
             ) {
                 Text(
                     text = text,

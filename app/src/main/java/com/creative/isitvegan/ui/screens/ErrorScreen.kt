@@ -49,9 +49,10 @@ fun ErrorScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(48.dp))
-            OutlinedButton(
+            Button(
                 onClick = onBackToHome,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large
             ) {
                 Text("Back to Home")
             }
