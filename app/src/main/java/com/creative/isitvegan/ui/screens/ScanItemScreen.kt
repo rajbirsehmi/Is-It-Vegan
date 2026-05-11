@@ -161,6 +161,7 @@ fun ScanItemScreen(
 
 @Composable
 fun ViewfinderOverlay() {
+    val primaryColor = MaterialTheme.colorScheme.primary
     Canvas(modifier = Modifier.fillMaxSize()) {
         val width = size.width
         val height = size.height
@@ -186,7 +187,7 @@ fun ViewfinderOverlay() {
 
         val cornerLength = 40.dp.toPx()
         val strokeWidth = 4.dp.toPx()
-        val color = Color.White
+        val color = primaryColor
 
         // Top Left
         drawPath(

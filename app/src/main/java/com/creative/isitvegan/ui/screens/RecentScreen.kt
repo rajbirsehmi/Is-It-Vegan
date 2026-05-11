@@ -67,7 +67,7 @@ fun RecentScreen(
                         Box(
                             Modifier
                                 .fillMaxSize()
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(MaterialTheme.shapes.medium)
                                 .background(color)
                                 .padding(horizontal = 20.dp),
                             contentAlignment = Alignment.CenterEnd

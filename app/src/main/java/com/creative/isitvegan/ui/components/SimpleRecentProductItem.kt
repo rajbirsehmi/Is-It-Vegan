@@ -35,7 +35,7 @@ fun SimpleRecentProductItem(
     val isNonVegan = veganStatus?.contains("en:non-vegan") == true
 
     val (statusIcon, statusColor) = when {
-        isVegan -> Icons.Default.Eco to Color(0xFF4CAF50)
+        isVegan -> Icons.Default.Eco to MaterialTheme.colorScheme.primary
         isNonVegan -> Icons.Default.NoFood to Color(0xFFF44336)
         else -> Icons.Default.Info to Color(0xFFFF9800)
     }
@@ -44,7 +44,7 @@ fun SimpleRecentProductItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 1.dp,
         shadowElevation = 1.dp
@@ -60,7 +60,7 @@ fun SimpleRecentProductItem(
                 contentDescription = null,
                 modifier = Modifier
                     .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentScale = ContentScale.Crop
             )
